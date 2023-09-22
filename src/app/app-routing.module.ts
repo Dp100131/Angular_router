@@ -1,63 +1,21 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-
-import { LayoutComponent } from './website/components/layout/layout.component';
-import { HomeComponent } from './website/pages/home/home.component';
-import { NotFoundComponent } from './website/pages/not-found/not-found.component';
-import { CategoryComponent } from './website/pages/category/category.component';
-import { MycartComponent } from './website/pages/mycart/mycart.component';
-import { LoginComponent } from './website/pages/login/login.component';
-import { RegisterComponent } from './website/pages/register/register.component';
-import { RecoveryComponent } from './website/pages/recovery/recovery.component';
-import { ProfileComponent } from './website/pages/profile/profile.component';
-import { ProductDetailComponent } from './website/pages/product-detail/product-detail.component';
+import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
+import { CustomPreloadService } from './services/custom-preload.service';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
+
   {
     path: '',
-    component: LayoutComponent,
-    children:[
-      {
-        path: '',
-        redirectTo: '/home',
-        pathMatch: 'full'
-      },
-      {
-        path: 'home',
-        component: HomeComponent
-      },
-      {
-        path: 'category/:id',
-        component: CategoryComponent
-      },
-      {
-        path: 'product/:id',
-        component: ProductDetailComponent
-      },
-      {
-        path: 'my-cart',
-        component: MycartComponent,
-      },
-      {
-        path: 'login',
-        component: LoginComponent,
-      },
-      {
-        path: 'register',
-        component: RegisterComponent,
-      },
-      {
-        path: 'recovery',
-        component: RecoveryComponent,
-      },
-      {
-        path: 'profile',
-        component: ProfileComponent,
-      }
-    ]
+    loadChildren: () => import('./website/website.module').then(m => m.WebsiteModule),
+    data:{
+      preload: true
+    }
   },
   {
     path: 'cms',
+    canActivate: [AdminGuard],
     loadChildren: () => import('./cms/cms.module').then(m => m.CmsModule)
   },
   {
@@ -69,7 +27,9 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    preloadingStrategy: PreloadAllModules
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
