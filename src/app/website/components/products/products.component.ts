@@ -1,14 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { switchMap } from 'rxjs/operators';
 
 import {
   Product,
   CreateProductDTO,
   UpdateProductDTO,
-} from '../../models/product.model';
+} from '../../../models/product.model';
 
-import { StoreService } from '../../services/store.service';
-import { ProductsService } from '../../services/products.service';
+import { StoreService } from '../../../services/store.service';
+import { ProductsService } from '../../../services/products.service';
 
 @Component({
   selector: 'app-products',
@@ -19,6 +18,11 @@ export class ProductsComponent {
   myShoppingCart: Product[] = [];
   total = 0;
   @Input() products: Product[] = [];
+  @Input() set productId(id: string | null){
+    if(id){
+      this.onShowDetail(id);
+    }
+  }
   @Output() LoadMore: EventEmitter<string> = new EventEmitter<string>();
   showProductDetail = false;
   productChosen: Product | null = null;
@@ -28,9 +32,10 @@ export class ProductsComponent {
 
   constructor(
     private storeService: StoreService,
-    private productsService: ProductsService
+    private productsService: ProductsService,
   ) {
     this.myShoppingCart = this.storeService.getShoppingCart();
+
   }
 
   onAddToShoppingCart(product: Product) {
@@ -44,7 +49,9 @@ export class ProductsComponent {
 
   onShowDetail(id: string) {
     this.statusDetail = 'loading';
-    this.toggleProductDetail();
+    if(!this.showProductDetail){
+      this.toggleProductDetail();
+    }
     this.productsService.getOne(id).subscribe(
       (data) => {
         this.productChosen = data;

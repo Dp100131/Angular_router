@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Location } from '@angular/common';
 
-import { Product } from '../../models/product.model';
+import { Product } from '../../../models/product.model';
 
 @Component({
   selector: 'app-product',
@@ -23,7 +24,18 @@ export class ProductComponent {
   @Output() addedProduct = new EventEmitter<Product>();
   @Output() showProduct = new EventEmitter<string>();
 
-  constructor() { }
+  rootToDetail: string = '';
+
+  constructor(
+    private location: Location
+  ) {
+    this.rootToDetail = (this.location.path().split('/')[1])
+    if(this.rootToDetail === "category"){
+      this.rootToDetail = this.location.path()
+    }else{
+      this.rootToDetail = (this.location.path().split('/')[1])
+    }
+  }
 
   onAddToCart() {
     this.addedProduct.emit(this.product);
